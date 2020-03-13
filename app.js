@@ -141,8 +141,9 @@ Vue.component('employeeform', {
 
             <div class="form-group row">
                     <label class="col-sm-4">empDepartment</label>
-                    <select v-model="empedit.emp_dpId.dpName" class="custom-select col-sm-7">
-                        <option v-for="department in departments"> {{department.dpName}}
+                    <select v-model="empedit.emp_dpId" class="custom-select col-sm-7">
+                        <option v-for="department in departments" v-bind:value="department"> 
+                            {{department.dpName}}
                         </option>
                     </select>
             </div>
@@ -151,7 +152,7 @@ Vue.component('employeeform', {
 
         <div id="formBtn" class="form-group row">
             <div class="col-sm-4">
-                <button class="btn btn-outline-primary">Update</button>
+                <button @click="updateEmployee(empedit)" class="btn btn-outline-primary">Update</button>
             </div>
             <div class="col-sm-4">
                 <button class="btn btn-outline-dark">Cancel</button>
@@ -161,7 +162,25 @@ Vue.component('employeeform', {
             </div>
         </div>
     </div>
-    `
+    `,
+    methods:{
+        updateEmployee(empedit){
+            
+            axios
+            .put('http://localhost:5000/spapp/emp/update/' + empedit.empId, {
+                empId: empedit.empId,
+                empName: empedit.empName,
+                empActive: empedit.empActive,
+                emp_dpId:{
+                    dpId: empedit.emp_dpId.dpId,
+                    dpName: empedit.emp_dpId.dpName
+                }
+            })
+            .catch(error => console.log(error))
+
+            console.log(empedit)
+        }
+    }
 })
 
 let spapp = new Vue({
@@ -195,10 +214,12 @@ let spapp = new Vue({
             axios
             .get('http://localhost:5000/spapp/emp/paginated/' + this.page + '/' + this.size)
             .then(response => (this.employees = response.data))
+            .catch(error => console.log(error))
 
             axios
             .get('http://localhost:5000/spapp/emp/pages')
             .then(response => (this.pages = Math.ceil( response.data / this.size )))
+            .catch(error => console.log(error))
         },
         showEmpDetails(employee){
             this.employeeDelete = employee
@@ -212,15 +233,18 @@ let spapp = new Vue({
             axios
             .get('http://localhost:5000/spapp/dep/all')
             .then(response => (this.departments = response.data))
+            .catch(error => console.log(error.status))
             //console.log(this.empedit)
         },
         deleteEmployee(empId){
             
             axios
             .delete('http://localhost:5000/spapp/emp/delete/' + empId)
-            .then(response => (console.log(response)))
-            //this.updatePage(this.page, this.size)
-            //console.log(this.page, this.size)
+            .then(response => {
+                //console.log(response);
+                this.updatePage(this.page, this.size);
+            })
+            .catch(error => console.log(error))
         }
     },
     mounted(){
