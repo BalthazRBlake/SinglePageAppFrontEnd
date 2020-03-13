@@ -71,14 +71,14 @@
                         <h5 class="blockquote text-right"><a href="/logout">Logout</a></h5>
                         <br/>
     
-                        <section id="empDetails" v-if="employeeDelete">                            
+                        <section id="empDetails" v-if="empSelected">                            
                             <h5>Selected Employee Details:</h5>
                             <p> 
-                                Employee <b>{{ employeeDelete.empName }}</b> 
-                                with Id# <b>{{ employeeDelete.empId }}</b> 
-                                is <b><span v-if="employeeDelete.empActive"> Active </span>
+                                Employee <b>{{ empSelected.empName }}</b> 
+                                with Id# <b>{{ empSelected.empId }}</b> 
+                                is <b><span v-if="empSelected.empActive"> Active </span>
                                     <span v-else> Inactive </span></b>
-                                in Departmet <b>{{ employeeDelete.emp_dpId.dpName }}</b>
+                                in Departmet <b>{{ empSelected.emp_dpId.dpName }}</b>
                                 <button @click='clearDetails' class="btn btn-link">Hide</button>
                             </p>
                         </section>

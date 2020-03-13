@@ -155,7 +155,7 @@ Vue.component('employeeform', {
                 <button @click="updateEmployee(empedit)" class="btn btn-outline-primary">Update</button>
             </div>
             <div class="col-sm-4">
-                <button class="btn btn-outline-dark">Cancel</button>
+                <button @click="cancelForm" class="btn btn-outline-dark">Cancel</button>
             </div>
             <div class="col-sm-4">
                 <button class="btn btn-outline-success">Save New</button>
@@ -178,6 +178,17 @@ Vue.component('employeeform', {
             })
             .catch(error => console.log(error))
             //console.log(empedit)
+        },
+        cancelForm(){
+            this.empedit = {
+                empId: 0,
+                empName: '',
+                empActive: false,
+                emp_dpId: {
+                    dpId: 0,
+                    dpName: ''
+                }
+            }
         }
     }
 })
@@ -191,7 +202,7 @@ let spapp = new Vue({
         pages: null,
         totalEmp: null,
         employees: null,
-        employeeDelete: null,
+        empSelected: null,
         empedit: {
             empId: 0,
             empName: '',
@@ -220,10 +231,10 @@ let spapp = new Vue({
             .catch(error => console.log(error))
         },
         showEmpDetails(employee){
-            this.employeeDelete = employee
+            this.empSelected = employee
         },
         clearDetails(){
-            this.employeeDelete = null
+            this.empSelected = null
         },
         editEmployee(employee){
             this.empedit = employee
