@@ -177,8 +177,7 @@ Vue.component('employeeform', {
                 }
             })
             .catch(error => console.log(error))
-
-            console.log(empedit)
+            //console.log(empedit)
         }
     }
 })
@@ -207,7 +206,6 @@ let spapp = new Vue({
     },
     methods: {
         updatePage(page, size){     
-
             this.page = page
             this.size = size
 
