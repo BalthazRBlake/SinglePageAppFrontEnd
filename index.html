@@ -86,7 +86,8 @@
                         <section id="editEmpDetails">
                             <h4>Edit form:</h4>
                             <employeeform :empedit="empedit"
-                                          :departments="departments"></employeeform>
+                                          :departments="departments"
+                                          @new-emp="updatePage"></employeeform>
                         </section>
                     </div>
                 </div>

@@ -126,7 +126,7 @@ Vue.component('employeeform', {
             <div class="form-group row">
                 <label class="col-sm-2 col-form-label">empName</label>
                 <div class="col-sm-10">
-                    <input type="text" v-model="empedit.empName" class="form-control">
+                    <input type="text" v-model="empedit.empName" class="form-control" placeholder="Name">
                 </div>
             </div>
 
@@ -134,7 +134,9 @@ Vue.component('employeeform', {
                 <div class="col-sm-2">empActive</div>
                 <div class="col-sm-10">
                     <div class="form-check">
-                        <input type="checkbox" v-model="empedit.empActive" class="form-check-input">
+                        <input type="checkbox" id="checkbox" v-model="empedit.empActive" class="form-check-input">
+                        <label for="checkbox" v-if="empedit.empActive">Yes</label>
+                        <label v-else>No</label>
                     </div>
                 </div>
             </div>
@@ -142,6 +144,7 @@ Vue.component('employeeform', {
             <div class="form-group row">
                     <label class="col-sm-4">empDepartment</label>
                     <select v-model="empedit.emp_dpId" class="custom-select col-sm-7">
+                        <option disabled>Please select one department</option>
                         <option v-for="department in departments" v-bind:value="department"> 
                             {{department.dpName}}
                         </option>
@@ -158,11 +161,18 @@ Vue.component('employeeform', {
                 <button @click="cancelForm" class="btn btn-outline-dark">Cancel</button>
             </div>
             <div class="col-sm-4">
-                <button class="btn btn-outline-success">Save New</button>
+                <button @click="addEmployee(empedit)" class="btn btn-outline-success">Save New</button>
             </div>
         </div>
     </div>
     `,
+    data(){
+        return{
+            page: 1,
+            size: 10,
+            
+        }
+    },
     methods:{
         updateEmployee(empedit){
             
@@ -176,6 +186,7 @@ Vue.component('employeeform', {
                     dpName: empedit.emp_dpId.dpName
                 }
             })
+            .then(response => console.log(response.data))
             .catch(error => console.log(error))
             //console.log(empedit)
         },
@@ -189,11 +200,27 @@ Vue.component('employeeform', {
                     dpName: ''
                 }
             }
+        },
+        addEmployee(empedit){
+            axios
+            .post('http://localhost:5000/spapp/emp/insert', {
+                empId: empedit.empId,
+                empName: empedit.empName,
+                empActive: empedit.empActive,
+                emp_dpId:{
+                    dpId: empedit.emp_dpId.dpId,
+                    dpName: empedit.emp_dpId.dpName
+                }
+            })
+            .then(response => {
+                this.$emit('new-emp', this.page, this.size)
+            })
+            .catch(error => console.log(error))
         }
     }
 })
 
-let spapp = new Vue({
+var spapp = new Vue({
     el: '#spapp',
     data() {
         return{
@@ -242,7 +269,7 @@ let spapp = new Vue({
             axios
             .get('http://localhost:5000/spapp/dep/all')
             .then(response => (this.departments = response.data))
-            .catch(error => console.log(error.status))
+            .catch(error => console.log(error))
             //console.log(this.empedit)
         },
         deleteEmployee(empId){
