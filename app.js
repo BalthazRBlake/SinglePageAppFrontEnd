@@ -122,13 +122,20 @@ Vue.component('employeeform', {
     },
     template: `
     <div id="form">
-        <form action="#">
+        <form>
+            <label v-if="idError" class="col-sm-12 col-form-label" style="color: red">
+                {{ idError }}
+            </label>
+
             <div class="form-group row">
                 <label class="col-sm-2 col-form-label">empName</label>
                 <div class="col-sm-10">
                     <input type="text" v-model="empedit.empName" class="form-control" placeholder="Name">
                 </div>
-                <label v-if="errors.length" class="col-sm-4 col-form-label"> {{ errors[0] }} </label>
+
+                <label v-if="nameError" class="col-sm-4 col-form-label" style="color: red">
+                    {{ nameError }}
+                </label>
             </div>
 
             <div class="form-group row">
@@ -150,6 +157,10 @@ Vue.component('employeeform', {
                             {{department.dpName}}
                         </option>
                     </select>
+
+                    <label v-if="dpError" class="col-sm-12 col-form-label" style="color: red">
+                        {{ dpError }}
+                    </label>
             </div>
 
         </form>
@@ -171,12 +182,15 @@ Vue.component('employeeform', {
         return{
             page: 1,
             size: 10,
-            errors: []
+            idError: '',
+            nameError: '',
+            dpError: ''
         }
     },
     methods:{
         updateEmployee(empedit){
-            if(empedit.empName){
+            
+            if(empedit.empId && empedit.empName && empedit.emp_dpId.dpId){
                 axios
                 .put('http://localhost:5000/spapp/emp/update/' + empedit.empId, {
                     empId: empedit.empId,
@@ -195,28 +209,39 @@ Vue.component('employeeform', {
                 .catch(error => console.log(error))
             }
             else{
-                this.errors.push("Name required.");
+                if(!empedit.empId) this.idError = "Please select user to be updated.";
+                if(!empedit.empName) this.nameError = "Name required.";
+                if(!empedit.emp_dpId.dpId) this.dpError = "Please select one department.";
             }
         },
         cancelForm(){
-            this.$emit('clear-form')
-            this.errors = [];
+            this.$emit('clear-form', this.page, this.size)
+            this.idError = this.nameError = this.dpError = '';
         },
         addEmployee(empedit){
-            axios
-            .post('http://localhost:5000/spapp/emp/insert', {
-                empId: empedit.empId,
-                empName: empedit.empName,
-                empActive: empedit.empActive,
-                emp_dpId:{
-                    dpId: empedit.emp_dpId.dpId,
-                    dpName: empedit.emp_dpId.dpName
-                }
-            })
-            .then(response => {
-                this.$emit('new-emp', this.page, this.size)
-            })
-            .catch(error => console.log(error))
+            if(empedit.empName && empedit.emp_dpId.dpId){
+                axios
+                .post('http://localhost:5000/spapp/emp/insert', {
+                    empId: empedit.empId,
+                    empName: empedit.empName,
+                    empActive: empedit.empActive,
+                    emp_dpId:{
+                        dpId: empedit.emp_dpId.dpId,
+                        dpName: empedit.emp_dpId.dpName
+                    }
+                })
+                .then(response => {
+                    if(response.data){
+                        this.cancelForm();
+                        this.$emit('new-emp', this.page, this.size)
+                    }
+                })
+                .catch(error => console.log(error))
+            }
+            else{
+                if(!empedit.empName) this.nameError = "Name required.";
+                if(!empedit.emp_dpId.dpId) this.dpError = "Please select one department.";
+            }
         }
     }
 })
@@ -264,7 +289,7 @@ var spapp = new Vue({
         clearDetails(){
             this.empSelected = null
         },
-        clearForm(){
+        clearForm(page, size){
             this.empedit = {
                 empId: 0,
                 empName: '',
@@ -274,6 +299,7 @@ var spapp = new Vue({
                     dpName: ''
                 }
             };
+            this.updatePage(page, size);
         },
         editEmployee(employee){
             this.empedit = employee
