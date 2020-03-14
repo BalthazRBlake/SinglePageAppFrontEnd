@@ -212,7 +212,7 @@ Vue.component('employeeform', {
             
             if(empedit.empId && empedit.empName && empedit.emp_dpId.dpId){
                 axios
-                .put('http://localhost:5000/spapp/emp/update/' + empedit.empId, {
+                .put('https://spa-java-api.herokuapp.com/spapp/emp/update/' + empedit.empId, {
                     empId: empedit.empId,
                     empName: empedit.empName,
                     empActive: empedit.empActive,
@@ -241,7 +241,7 @@ Vue.component('employeeform', {
         addEmployee(empedit){
             if(empedit.empName && empedit.emp_dpId.dpId){
                 axios
-                .post('http://localhost:5000/spapp/emp/insert', {
+                .post('https://spa-java-api.herokuapp.com/spapp/emp/insert', {
                     empId: empedit.empId,
                     empName: empedit.empName,
                     empActive: empedit.empActive,
@@ -283,7 +283,7 @@ Vue.component('searchemp', {
         triggerSearch(name){
             if(name){
                 axios
-                .get('http://localhost:5000/spapp/emp/search/' + name)
+                .get('https://spa-java-api.herokuapp.com/spapp/emp/search/' + name)
                 .then(response => {
                     this.$emit('found-emps', response.data);
                 })
@@ -325,12 +325,12 @@ var spapp = new Vue({
             this.size = size;
 
             axios
-            .get('http://localhost:5000/spapp/emp/paginated/' + this.page + '/' + this.size)
+            .get('https://spa-java-api.herokuapp.com/spapp/emp/paginated/' + this.page + '/' + this.size)
             .then(response => (this.employees = response.data))
             .catch(error => console.log(error))
 
             axios
-            .get('http://localhost:5000/spapp/emp/pages')
+            .get('https://spa-java-api.herokuapp.com/spapp/emp/pages')
             .then(response => (this.pages = Math.ceil( response.data / this.size )))
             .catch(error => console.log(error))
         },
@@ -356,7 +356,7 @@ var spapp = new Vue({
             this.empedit = employee
 
             axios
-            .get('http://localhost:5000/spapp/dep/all')
+            .get('https://spa-java-api.herokuapp.com/spapp/dep/all')
             .then(response => (this.departments = response.data))
             .catch(error => console.log(error))
             //console.log(this.empedit)
@@ -364,7 +364,7 @@ var spapp = new Vue({
         deleteEmployee(empId){
             
             axios
-            .delete('http://localhost:5000/spapp/emp/delete/' + empId)
+            .delete('https://spa-java-api.herokuapp.com/spapp/emp/delete/' + empId)//http://localhost:5000/
             .then(response => {
                 //console.log(response);
                 this.updatePage(this.page, this.size);
