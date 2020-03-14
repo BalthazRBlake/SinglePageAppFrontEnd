@@ -268,12 +268,33 @@ Vue.component('employeeform', {
 
 Vue.component('searchemp', {
     template: `
-    <form id="searchName" class="form-inline my-2 my-lg-0">
-        <input class="form-control mr-sm-2" type="search" placeholder="Search by name" aria-label="Search" id="nameSearch">
-        <button class="btn btn-outline-info my-2 my-sm-0 searchEmp" type="submit">Search</button>
-        <button class="btn btn-outline-info my-2 my-sm-0 reset" type="submit">Reset</button>
-    </form>
-    `
+    <div class="form-inline my-2 my-lg-0">
+        <input v-model="name" class="form-control mr-sm-2" type="search" placeholder="Name biginning with" aria-label="Search">
+        <button @click="triggerSearch(name)" class="btn btn-outline-info my-2 my-sm-0">Search</button>
+        <button @click="triggerReset" class="btn btn-outline-info my-2 my-sm-0">Reset</button>
+    </div>
+    `,
+    data(){
+        return{
+            name: ''
+        }
+    },
+    methods: {
+        triggerSearch(name){
+            if(name){
+                axios
+                .get('http://localhost:5000/spapp/emp/search/' + name)
+                .then(response => {
+                    this.$emit('found-emps', response.data);
+                })
+                .catch(error => console.log(error))
+            }
+        },
+        triggerReset(){
+            this.name = '';
+            this.$emit('clear-search', 1, 10);
+        }
+    }
 })
 
 var spapp = new Vue({
@@ -349,6 +370,10 @@ var spapp = new Vue({
                 this.updatePage(this.page, this.size);
             })
             .catch(error => console.log(error))
+        },
+        loadFound(emps){
+            this.pages = Math.ceil(emps.length / 100);
+            this.employees = emps;
         }
     },
     mounted(){
