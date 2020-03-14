@@ -30,7 +30,7 @@ Vue.component('employees', {
 
                         <th scope="row"> {{employee.empId}} </th>
                         <td > {{employee.empName}} </td>
-                        <td v-if="employee.empActive"> Yes </td>
+                        <td v-if="employee.empActive" class="table-info"> Yes </td>
                         <td v-else class="bg-danger">No</td>
                         <td > {{employee.emp_dpId.dpName}} </td>
 
@@ -104,13 +104,21 @@ Vue.component('pagesmenu', {
     },
     methods: {
         change(page, size) {
-            this.$emit('change-page', page, size)
+            this.$emit('change-page', page, size);
         }
     }
 })
 
 Vue.component('employeeform', {
     props: {
+        page: {
+            type: Number,
+            requied: true
+        },
+        size: {
+            type: Number,
+            requied: true
+        },
         empedit: {
             type: Object,
             requied: true
@@ -152,7 +160,11 @@ Vue.component('employeeform', {
             <div class="form-group row">
                     <label class="col-sm-4">empDepartment</label>
                     <select v-model="empedit.emp_dpId" class="custom-select col-sm-7">
-                        <option disabled>Please select one department</option>
+
+                        <option disabled v-bind:value="department0[0]">
+                            Please select one department
+                        </option>
+
                         <option v-for="department in departments" v-bind:value="department"> 
                             {{department.dpName}}
                         </option>
@@ -170,7 +182,7 @@ Vue.component('employeeform', {
                 <button @click="updateEmployee(empedit)" class="btn btn-outline-primary">Update</button>
             </div>
             <div class="col-sm-4">
-                <button @click="cancelForm" class="btn btn-outline-dark">Cancel</button>
+                <button @click="cancelForm(size)" class="btn btn-outline-dark">Cancel</button>
             </div>
             <div class="col-sm-4">
                 <button @click="addEmployee(empedit)" class="btn btn-outline-success">Save New</button>
@@ -180,11 +192,19 @@ Vue.component('employeeform', {
     `,
     data(){
         return{
-            page: 1,
-            size: 10,
             idError: '',
             nameError: '',
             dpError: ''
+        }
+    },
+    computed: {
+        department0(){
+            let arr = [];
+            arr.unshift({
+                dpId: 0,
+                dpName: ''
+            });
+            return arr;
         }
     },
     methods:{
@@ -209,13 +229,13 @@ Vue.component('employeeform', {
                 .catch(error => console.log(error))
             }
             else{
-                if(!empedit.empId) this.idError = "Please select user to be updated.";
+                if(!empedit.empId) this.idError = "Please select the employee to be updated.";
                 if(!empedit.empName) this.nameError = "Name required.";
                 if(!empedit.emp_dpId.dpId) this.dpError = "Please select one department.";
             }
         },
-        cancelForm(){
-            this.$emit('clear-form', this.page, this.size)
+        cancelForm(size){
+            this.$emit('clear-form', this.page, size);
             this.idError = this.nameError = this.dpError = '';
         },
         addEmployee(empedit){
@@ -233,7 +253,7 @@ Vue.component('employeeform', {
                 .then(response => {
                     if(response.data){
                         this.cancelForm();
-                        this.$emit('new-emp', this.page, this.size)
+                        this.$emit('new-emp', this.page, this.size);
                     }
                 })
                 .catch(error => console.log(error))
@@ -265,13 +285,13 @@ var spapp = new Vue({
                 dpName: ''
             }
         },
-        departments: null
+        departments: []
         }
     },
     methods: {
         updatePage(page, size){     
-            this.page = page
-            this.size = size
+            this.page = page;
+            this.size = size;
 
             axios
             .get('http://localhost:5000/spapp/emp/paginated/' + this.page + '/' + this.size)

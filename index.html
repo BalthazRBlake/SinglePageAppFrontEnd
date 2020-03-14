@@ -58,11 +58,7 @@
                                     @show-details="showEmpDetails"
                                     @edit-emp="editEmployee"
                                     @delete-emp="deleteEmployee"></employees>
-                        
-                        <pagesmenu @change-page="updatePage" 
-                                   :page="page"
-                                   :pages="pages"></pagesmenu>
-                                   
+                    
                         </section>
                     </div>
     
@@ -87,6 +83,8 @@
                             <h4>Edit form:</h4>
                             <employeeform :empedit="empedit"
                                           :departments="departments"
+                                          :page="page"
+                                          :size="size"
                                           @new-emp="updatePage"
                                           @clear-form="clearForm"></employeeform>
                         </section>
