@@ -128,6 +128,7 @@ Vue.component('employeeform', {
                 <div class="col-sm-10">
                     <input type="text" v-model="empedit.empName" class="form-control" placeholder="Name">
                 </div>
+                <label v-if="errors.length" class="col-sm-4 col-form-label"> {{ errors[0] }} </label>
             </div>
 
             <div class="form-group row">
@@ -170,36 +171,36 @@ Vue.component('employeeform', {
         return{
             page: 1,
             size: 10,
-            
+            errors: []
         }
     },
     methods:{
         updateEmployee(empedit){
-            
-            axios
-            .put('http://localhost:5000/spapp/emp/update/' + empedit.empId, {
-                empId: empedit.empId,
-                empName: empedit.empName,
-                empActive: empedit.empActive,
-                emp_dpId:{
-                    dpId: empedit.emp_dpId.dpId,
-                    dpName: empedit.emp_dpId.dpName
-                }
-            })
-            .then(response => console.log(response.data))
-            .catch(error => console.log(error))
-            //console.log(empedit)
+            if(empedit.empName){
+                axios
+                .put('http://localhost:5000/spapp/emp/update/' + empedit.empId, {
+                    empId: empedit.empId,
+                    empName: empedit.empName,
+                    empActive: empedit.empActive,
+                    emp_dpId:{
+                        dpId: empedit.emp_dpId.dpId,
+                        dpName: empedit.emp_dpId.dpName
+                    }
+                })
+                .then(response => {
+                    if(response.data){
+                        this.cancelForm();
+                    }
+                })
+                .catch(error => console.log(error))
+            }
+            else{
+                this.errors.push("Name required.");
+            }
         },
         cancelForm(){
-            this.empedit = {
-                empId: 0,
-                empName: '',
-                empActive: false,
-                emp_dpId: {
-                    dpId: 0,
-                    dpName: ''
-                }
-            }
+            this.$emit('clear-form')
+            this.errors = [];
         },
         addEmployee(empedit){
             axios
@@ -262,6 +263,17 @@ var spapp = new Vue({
         },
         clearDetails(){
             this.empSelected = null
+        },
+        clearForm(){
+            this.empedit = {
+                empId: 0,
+                empName: '',
+                empActive: false,
+                emp_dpId: {
+                    dpId: 0,
+                    dpName: ''
+                }
+            };
         },
         editEmployee(employee){
             this.empedit = employee
