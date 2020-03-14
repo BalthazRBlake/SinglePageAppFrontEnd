@@ -151,8 +151,8 @@ Vue.component('employeeform', {
                 <div class="col-sm-10">
                     <div class="form-check">
                         <input type="checkbox" id="checkbox" v-model="empedit.empActive" class="form-check-input">
-                        <label for="checkbox" v-if="empedit.empActive">Yes</label>
-                        <label v-else>No</label>
+                        <label for="checkbox" v-if="empedit.empActive" class="table-info">&nbsp Yes &nbsp</label>
+                        <label v-else class="bg-danger">&nbsp No &nbsp</label>
                     </div>
                 </div>
             </div>
@@ -223,7 +223,7 @@ Vue.component('employeeform', {
                 })
                 .then(response => {
                     if(response.data){
-                        this.cancelForm();
+                        this.cancelForm(this.size);
                     }
                 })
                 .catch(error => console.log(error))
@@ -252,7 +252,7 @@ Vue.component('employeeform', {
                 })
                 .then(response => {
                     if(response.data){
-                        this.cancelForm();
+                        this.cancelForm(this.size);
                         this.$emit('new-emp', this.page, this.size);
                     }
                 })
@@ -264,6 +264,16 @@ Vue.component('employeeform', {
             }
         }
     }
+})
+
+Vue.component('searchemp', {
+    template: `
+    <form id="searchName" class="form-inline my-2 my-lg-0">
+        <input class="form-control mr-sm-2" type="search" placeholder="Search by name" aria-label="Search" id="nameSearch">
+        <button class="btn btn-outline-info my-2 my-sm-0 searchEmp" type="submit">Search</button>
+        <button class="btn btn-outline-info my-2 my-sm-0 reset" type="submit">Reset</button>
+    </form>
+    `
 })
 
 var spapp = new Vue({
